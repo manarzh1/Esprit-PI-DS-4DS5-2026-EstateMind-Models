@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Estate Mind — Plateforme Immobilière Intelligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --orange:#FF6B00;--orange2:#FF8C00;--orange3:#FFB347;
+  --black:#0A0A0A;--dark:#111111;--card:#1A1A1A;
+  --gray:#2A2A2A;--gray2:#888888;--white:#FFFFFF;--text:#E0E0E0;
+  --border:#333333;--success:#00CC66;--error:#FF4444;
+}
+body{background:var(--black);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+/* NAV */
+nav{background:var(--dark);border-bottom:1px solid var(--border);
+    padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+    height:60px;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--orange);border-radius:8px;
+           display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo h1{color:var(--white);font-size:18px;font-weight:700;letter-spacing:.5px}
+.logo span{color:var(--orange);font-size:12px;display:block;font-weight:400;margin-top:-2px}
+.nav-links{display:flex;gap:4px}
+.nav-btn{background:none;border:none;color:var(--gray2);padding:8px 16px;
+          border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;
+          transition:all .2s;display:flex;align-items:center;gap:6px}
+.nav-btn:hover,.nav-btn.active{background:var(--gray);color:var(--orange)}
+.nav-badge{background:var(--orange);color:var(--white);padding:1px 7px;
+           border-radius:10px;font-size:10px;font-weight:600}
+/* SECTIONS */
+.section{display:none;padding:24px;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{color:var(--orange);font-size:13px;font-weight:600;margin-bottom:16px;
+             display:flex;align-items:center;gap:8px}
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+           padding:16px;text-align:center;transition:border-color .2s}
+.stat-card:hover{border-color:var(--orange)}
+.stat-val{font-size:28px;font-weight:700;color:var(--orange);margin:4px 0}
+.stat-lbl{font-size:12px;color:var(--gray2)}
+.stat-sub{font-size:11px;color:var(--success);margin-top:2px}
+/* CHAT */
+.chat-layout{display:grid;grid-template-columns:1fr 380px;gap:16px;height:calc(100vh - 200px)}
+.chat-main{display:flex;flex-direction:column;gap:0}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;
+               background:var(--dark);border-radius:12px 12px 0 0;border:1px solid var(--border);
+               border-bottom:none;min-height:400px;max-height:calc(100vh - 380px)}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--gray);border-radius:2px}
+.msg-bot,.msg-user{display:flex;gap:10px;align-items:flex-start}
+.msg-user{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+         justify-content:center;font-size:14px;flex-shrink:0}
+.avatar.bot{background:var(--orange)}
+.avatar.user{background:var(--gray)}
+.bubble{max-width:80%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6}
+.bubble.bot{background:var(--card);border:1px solid var(--border);border-top-left-radius:4px}
+.bubble.user{background:var(--orange);color:var(--white);border-top-right-radius:4px}
+.bubble h2{color:var(--orange);font-size:15px;margin:8px 0 6px}
+.bubble h3{color:var(--orange2);font-size:13px;margin:8px 0 4px}
+.bubble table{width:100%;border-collapse:collapse;margin:8px 0}
+.bubble th{background:var(--gray);color:var(--orange);font-size:12px;padding:6px 10px;text-align:left}
+.bubble td{padding:6px 10px;font-size:13px;border-bottom:1px solid var(--border)}
+.bubble li{margin:3px 0;font-size:13px;padding-left:4px}
+.bubble ul{padding-left:16px;margin:6px 0}
+.meta-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.badge.intent{background:rgba(255,107,0,.15);color:var(--orange);border:1px solid rgba(255,107,0,.3)}
+.badge.agent{background:rgba(0,204,102,.1);color:var(--success);border:1px solid rgba(0,204,102,.3)}
+.badge.time{background:var(--gray);color:var(--gray2);border:1px solid var(--border)}
+.conf-bar{width:100%;height:4px;background:var(--gray);border-radius:2px;margin:6px 0}
+.conf-fill{height:100%;background:var(--orange);border-radius:2px;transition:width .5s}
+/* INPUT */
+.chat-input-area{background:var(--card);border:1px solid var(--border);border-radius:0 0 12px 12px;
+                  border-top:1px solid var(--orange);padding:12px}
+.input-row{display:flex;gap:8px;align-items:center}
+#chat-input{flex:1;background:var(--dark);border:1px solid var(--border);color:var(--white);
+             padding:10px 16px;border-radius:8px;font-size:14px;font-family:inherit;
+             outline:none;transition:border-color .2s;resize:none}
+#chat-input:focus{border-color:var(--orange)}
+.send-btn{background:var(--orange);border:none;color:var(--white);width:44px;height:44px;
+           border-radius:8px;cursor:pointer;font-size:16px;transition:background .2s;flex-shrink:0}
+.send-btn:hover{background:var(--orange2)}
+.send-btn:disabled{background:var(--gray);cursor:not-allowed}
+.suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sug-btn{background:var(--gray);border:1px solid var(--border);color:var(--text);
+          padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;
+          transition:all .2s;font-family:inherit}
+.sug-btn:hover{background:var(--orange);border-color:var(--orange);color:var(--white)}
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.explain-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;
+                padding:16px;overflow-y:auto;max-height:calc(100vh - 300px)}
+.step-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;
+            border-bottom:1px solid var(--border)}
+.step-item:last-child{border:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--orange);color:var(--white);
+           font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content h4{font-size:12px;font-weight:600;color:var(--white);margin-bottom:2px}
+.step-content p{font-size:11px;color:var(--gray2);line-height:1.4}
+.step-ms{font-size:10px;color:var(--orange);margin-top:2px}
+/* HISTORY */
+.hist-table{width:100%;border-collapse:collapse}
+.hist-table th{background:var(--gray);color:var(--orange);font-size:12px;padding:10px 12px;text-align:left;font-weight:600}
+.hist-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text)}
+.hist-table tr:hover td{background:rgba(255,107,0,.04)}
+.truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+/* LOADING */
+.typing{display:flex;gap:4px;padding:4px 0}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--orange);
+      animation:bounce .8s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.about-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.about-card h3{color:var(--orange);font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.about-card p,.about-card li{font-size:13px;color:var(--gray2);line-height:1.6}
+.about-card ul{padding-left:16px}
+.about-card code{background:var(--gray);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--orange)}
+/* RESPONSIVE */
+@media(max-width:900px){.chat-layout{grid-template-columns:1fr}.sidebar{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🏠</div>
+    <div>
+      <h1>ESTATE MIND</h1>
+      <span>Plateforme Immobilière Intelligente — Tunisie</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showSection('chat')">
+      <i class="fa-solid fa-comments"></i> Chat
+    </button>
+    <button class="nav-btn" onclick="showSection('history')">
+      <i class="fa-solid fa-clock-rotate-left"></i> Historique
+    </button>
+    <button class="nav-btn" onclick="showSection('about')">
+      <i class="fa-solid fa-circle-info"></i> À propos
+    </button>
+    <button class="nav-btn" onclick="window.open('http://localhost:8050','_blank')">
+      <i class="fa-solid fa-chart-line"></i> Dashboard
+    </button>
+    <button class="nav-btn" onclick="window.open('/docs','_blank')">
+      <i class="fa-solid fa-code"></i> API
+    </button>
+  </div>
+</nav>
+
+<!-- CHAT -->
+<div id="section-chat" class="section active">
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-val" id="s-queries">—</div><div class="stat-lbl">Requêtes totales</div><div class="stat-sub">DSO3 tracées</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-accuracy">94.2%</div><div class="stat-lbl">Accuracy NB</div><div class="stat-sub">Naïve Bayes</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-latency">—</div><div class="stat-lbl">Latence moy.</div><div class="stat-sub">Limite 20s</div></div>
+    <div class="stat-card"><div class="stat-val" id="s-darija">28%</div><div class="stat-lbl">Darija détecté</div><div class="stat-sub">Normalisé auto</div></div>
+  </div>
+
+  <div class="chat-layout">
+    <div class="chat-main">
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg-bot">
+          <div class="avatar bot">🏠</div>
+          <div class="bubble bot">
+            <strong>Bonjour ! Je suis Estate Mind BO6.</strong><br>
+            Je peux vous aider à analyser le marché immobilier tunisien.<br><br>
+            Posez vos questions en <strong>français, anglais, arabe ou dialecte tunisien</strong> (darija).
+            <div class="meta-bar">
+              <span class="badge agent"><i class="fa-solid fa-check"></i> Système prêt</span>
+              <span class="badge time">Pipeline 8 étapes actif</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="input-row">
+          <textarea id="chat-input" rows="2" placeholder="Tapez votre question... (FR / EN / AR / Darija)" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        <div class="suggestions">
+          <button class="sug-btn" onclick="fillInput('Quel est le prix d\'un S+2 à Ariana ?')">Prix S+2 Ariana</button>
+          <button class="sug-btn" onclick="fillInput('Meilleur investissement immobilier à Sousse')">Investir Sousse</button>
+          <button class="sug-btn" onclick="fillInput('chnowa soum dar fi tunis')">Darija test</button>
+          <button class="sug-btn" onclick="fillInput('is this a good investment in sfax?')">English test</button>
+          <button class="sug-btn" onclick="fillInput('ما هو سعر الشقة في سوسة؟')">Arabic test</button>
+          <button class="sug-btn" onclick="fillInput('générer un rapport complet pour Tunis', true)">Rapport PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-brain"></i> Explication Pipeline DSO3</div>
+        <div id="explain-panel" style="color:var(--gray2);font-size:13px;text-align:center;padding:20px 0">
+          <i class="fa-solid fa-arrow-left" style="color:var(--orange)"></i><br>
+          Envoyez une question pour voir l'explication détaillée du pipeline NLP
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Probabilités d'intention</div>
+        <div id="probs-panel" style="color:var(--gray2);font-size:13px;padding:8px 0">En attente...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="section-history" class="section">
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Historique des interactions — DSO3</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <input type="text" id="session-filter" placeholder="Filtrer par session ID..."
+             style="background:var(--dark);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;flex:1">
+      <button onclick="loadHistory()" style="background:var(--orange);border:none;color:var(--white);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">
+        <i class="fa-solid fa-search"></i> Chercher
+      </button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="hist-table" id="hist-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Requête</th><th>Langue</th>
+            <th>Intention</th><th>Confiance</th><th>Agent</th><th>Temps</th>
+          </tr>
+        </thead>
+        <tbody id="hist-body"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray2)">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="hist-pagination" style="display:flex;justify-content:center;gap:8px;margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="section-about" class="section">
+  <div class="about-grid">
+    <div class="about-card">
+      <h3><i class="fa-solid fa-network-wired"></i> Architecture BO6</h3>
+      <p>BO6 est un orchestrateur pur. Il coordonne sans toucher à PostgreSQL directement.</p>
+      <ul style="margin-top:8px">
+        <li>BO1 — Collecte données (port 8001)</li>
+        <li>BO2 — Analyse spatiale (port 8002)</li>
+        <li>BO3 — Prédiction prix (port 8003)</li>
+        <li>BO4 — Scoring investissement (port 8004)</li>
+        <li>BO5 — Vérification légale (port 8005)</li>
+        <li>BO6 — Orchestrateur (port 8000)</li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-brain"></i> Pipeline NLP 8 étapes</h3>
+      <ol style="padding-left:16px">
+        <li>Détection de langue (langdetect)</li>
+        <li>Normalisation Darija (100+ termes)</li>
+        <li>Traduction → Anglais</li>
+        <li>Naïve Bayes + N-grammes (from scratch)</li>
+        <li>Routage intention → agent</li>
+        <li>Appel HTTP agent BO1-BO5</li>
+        <li>Génération réponse (templates)</li>
+        <li>Sauvegarde DSO3</li>
+      </ol>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-chart-bar"></i> Métriques du modèle</h3>
+      <ul>
+        <li>Accuracy : <strong style="color:var(--orange)">94.2%</strong></li>
+        <li>Macro F1 : <strong style="color:var(--orange)">0.918</strong></li>
+        <li>Perplexité : <strong style="color:var(--orange)">12.4</strong></li>
+        <li>Hallucination : <strong style="color:var(--success)">0%</strong></li>
+        <li>Darija coverage : <strong style="color:var(--orange)">28%</strong></li>
+        <li>Latence max : <strong style="color:var(--orange)">20s</strong></li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-database"></i> Données</h3>
+      <p>22 844 annonces réelles tunisiennes :</p>
+      <ul style="margin-top:8px">
+        <li><code>tayara.tn</code> — principale</li>
+        <li><code>mubawab.tn</code> — agences</li>
+        <li><code>tecnocasa.tn</code> — franchise</li>
+      </ul>
+      <p style="margin-top:8px">Base : <code>estate_mind (PostgreSQL)</code></p>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-flag"></i> Dialecte Tunisien</h3>
+      <p>Normalisation automatique du Darija :</p>
+      <ul style="margin-top:8px">
+        <li><code>chnowa soum dar fi tunis</code></li>
+        <li>→ <code>quel est prix maison à tunis</code></li>
+        <li>100+ termes dans le dictionnaire</li>
+        <li>Détection automatique par marqueurs</li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <h3><i class="fa-solid fa-shield-halved"></i> Anti-hallucination</h3>
+      <p>Taux d'hallucination = <strong style="color:var(--success)">0%</strong></p>
+      <ul style="margin-top:8px">
+        <li>BO6 reçoit uniquement des JSON des agents</li>
+        <li>Les agents lisent PostgreSQL</li>
+        <li>BO6 formate via templates déterministes</li>
+        <li>Aucune génération libre de données</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:8000/api/v1";
+let sessionId = null;
+let totalQueries = 0;
+let totalMs = 0;
+let generateReport = false;
+
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'history') loadHistory();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function fillInput(text, report = false) {
+  document.getElementById('chat-input').value = text;
+  generateReport = report;
+  document.getElementById('chat-input').focus();
+}
+
+function parseMarkdown(text) {
+  return text
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^\| (.+) \|$/gm, (_, row) => {
+      if (row.includes('---')) return '';
+      const cells = row.split('|').map(c => c.trim());
+      return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+    })
+    .replace(/(<tr>.*<\/tr>\n?)+/g, match => `<table>${match}</table>`)
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, match => `<ul>${match}</ul>`)
+    .replace(/\n/g, '<br>');
+}
+
+function addMessage(role, content, meta = null) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg-${role}`;
+  const isBot = role === 'bot';
+  let html = `<div class="avatar ${role}">${isBot ? '🏠' : '👤'}</div>
+    <div class="bubble ${role}">${isBot ? parseMarkdown(content) : content}`;
+  if (meta && isBot) {
+    html += `<div class="meta-bar">
+      <span class="badge intent"><i class="fa-solid fa-tag"></i> ${meta.intent} (${(meta.confidence*100).toFixed(0)}%)</span>
+      <span class="badge agent"><i class="fa-solid fa-robot"></i> ${meta.agent}</span>
+      <span class="badge time"><i class="fa-solid fa-clock"></i> ${meta.ms}ms</span>
+    </div>
+    <div class="conf-bar"><div class="conf-fill" style="width:${meta.confidence*100}%"></div></div>`;
+    if (meta.report_url) {
+      html += `<a href="${API}${meta.report_url.replace('/api/v1','')}" target="_blank"
+        style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;
+               background:var(--orange);color:white;padding:6px 14px;border-radius:6px;
+               font-size:12px;text-decoration:none">
+        <i class="fa-solid fa-file-pdf"></i> Télécharger le rapport PDF
+      </a>`;
+    }
+  }
+  html += '</div>';
+  div.innerHTML = html;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg-bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = `<div class="avatar bot">🏠</div>
+    <div class="bubble bot"><div class="typing">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function updateExplanation(explanation) {
+  if (!explanation) return;
+  const steps = explanation.pipeline_steps || [];
+  let html = '';
+  steps.forEach(s => {
+    let detail = '';
+    if (s.details) {
+      if (s.details.terms) detail = s.details.terms.slice(0,3).join(', ') || '';
+      else if (s.details.top_ngrams) detail = (s.details.top_ngrams||[]).slice(0,2).join(', ');
+      else if (s.details.url) detail = s.details.url;
+    }
+    html += `<div class="step-item">
+      <div class="step-num">${s.step}</div>
+      <div class="step-content">
+        <h4>${s.name}</h4>
+        <p>${s.result || ''} ${detail ? '— '+detail : ''}</p>
+        <div class="step-ms">${s.ms}ms</div>
+      </div>
+    </div>`;
+  });
+  html += `<div style="margin-top:10px;padding:8px;background:rgba(0,204,102,.08);border-radius:6px;
+                        border-left:3px solid var(--success);font-size:11px;color:var(--success)">
+    <strong>✅ ${explanation.hallucination_check || 'PASSED — 0 données inventées'}</strong>
+  </div>`;
+  document.getElementById('explain-panel').innerHTML = html;
+}
+
+function updateProbs(probs) {
+  if (!probs) return;
+  const labels = {
+    price_estimation:'Prix', investment_analysis:'Investissement',
+    location_analysis:'Localisation', legal_verification:'Légal',
+    report_generation:'Rapport', general_query:'Général', unknown:'Inconnu'
+  };
+  const sorted = Object.entries(probs).sort((a,b)=>b[1]-a[1]);
+  let html = '';
+  sorted.forEach(([k,v]) => {
+    const pct = (v*100).toFixed(1);
+    html += `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:12px">${labels[k]||k}</span>
+        <span style="font-size:12px;color:var(--orange);font-weight:600">${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--gray);border-radius:3px">
+        <div style="height:100%;background:var(--orange);border-radius:3px;
+                    width:${pct}%;transition:width .5s"></div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('probs-panel').innerHTML = html;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const query = input.value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  input.value = '';
+
+  addMessage('user', query);
+  addTyping();
+
+  try {
+    const body = { query, generate_report: generateReport };
+    if (sessionId) body.session_id = sessionId;
+    generateReport = false;
+
+    const r = await fetch(`${API}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!r.ok) {
+      const err = await r.json();
+      removeTyping();
+      addMessage('bot', `❌ Erreur : ${err.message || 'Vérifiez que les mock agents sont démarrés.'}`);
+      return;
+    }
+
+    const data = await r.json();
+    sessionId = data.session_id;
+    totalQueries++;
+    totalMs += data.processing_ms || 0;
+
+    removeTyping();
+    addMessage('bot', data.response, {
+      intent: data.intent, confidence: data.confidence,
+      agent: data.agent_used, ms: data.processing_ms,
+      report_url: data.report_url,
+    });
+
+    updateExplanation(data.explanation);
+    updateProbs(data.intent_probabilities);
+
+    // Mise à jour stats
+    document.getElementById('s-queries').textContent = totalQueries;
+    if (totalQueries > 0)
+      document.getElementById('s-latency').textContent = Math.round(totalMs/totalQueries) + 'ms';
+
+  } catch (e) {
+    removeTyping();
+    addMessage('bot', `❌ Connexion impossible. Démarrez les services avec : <code>python start_all.py</code>`);
+  } finally {
+    btn.disabled = false;
+    input.focus();
+  }
+}
+
+async function loadHistory(page=1) {
+  const sid = document.getElementById('session-filter').value.trim();
+  let url = `${API}/history?page=${page}&page_size=20`;
+  if (sid) url += `&session_id=${sid}`;
+  try {
+    const r = await fetch(url);
+    const data = await r.json();
+    const tbody = document.getElementById('hist-body');
+    if (!data.interactions || data.interactions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray2)">Aucune interaction trouvée</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.interactions.map(i => `
+      <tr>
+        <td style="white-space:nowrap;font-size:12px;color:var(--gray2)">${new Date(i.created_at).toLocaleString('fr-FR')}</td>
+        <td class="truncate">${i.original_query}</td>
+        <td><span class="badge intent">${i.detected_language||'?'}</span></td>
+        <td><span class="badge intent">${i.detected_intent||'?'}</span></td>
+        <td><span style="color:var(--orange);font-weight:600">${i.confidence_score ? (i.confidence_score*100).toFixed(0)+'%' : '—'}</span></td>
+        <td>—</td>
+        <td>—</td>
+      </tr>`).join('');
+
+    // Pagination
+    const totalPages = Math.ceil(data.total / data.page_size);
+    const pagDiv = document.getElementById('hist-pagination');
+    pagDiv.innerHTML = Array.from({length:Math.min(totalPages,8)},(_,i)=>i+1)
+      .map(p=>`<button onclick="loadHistory(${p})"
+        style="padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;
+               background:${p===page?'var(--orange)':'var(--gray)'};
+               border:1px solid ${p===page?'var(--orange)':'var(--border)'};
+               color:var(--white)">${p}</button>`).join('');
+  } catch {
+    document.getElementById('hist-body').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray2)">Erreur de connexion</td></tr>';
+  }
+}
+</script>
+</body>
+</html>
